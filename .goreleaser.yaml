@@ -23,8 +23,9 @@ builds:
       # No arm64 Windows builds — cross-compilation works but there's no demand yet.
       - goos: windows
         goarch: arm64
-    ldflags:
+    flags:
       - -trimpath
+    ldflags:
       - -s -w
       - -X github.com/lambdabaa/dewey/apps/cli/internal/version.Version={{.Version}}
       - -X github.com/lambdabaa/dewey/apps/cli/internal/version.Commit={{.Commit}}
