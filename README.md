@@ -1,25 +1,77 @@
 # dewey
 
-Terminal-native access to the Dewey API. See `docs/dewey-cli-plan.md` for the
-full project brief.
+[![CI](https://github.com/meetdewey/dewey-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/meetdewey/dewey-cli/actions/workflows/ci.yml)
 
-## Build
-
-```sh
-go build -ldflags="-X github.com/lambdabaa/dewey/apps/cli/internal/version.Version=$(git describe --tags --always) \
-                   -X github.com/lambdabaa/dewey/apps/cli/internal/version.Commit=$(git rev-parse --short HEAD) \
-                   -s -w" -trimpath -o dewey ./cmd/dewey
-```
-
-## Run
+Terminal-native access to the [Dewey](https://meetdewey.com) document backend API. Upload documents, run hybrid search, stream cited research answers — all from the command line.
 
 ```sh
 export DEWEY_API_KEY=dwy_live_…
-./dewey doctor
-./dewey collections list
-./dewey upload ./papers/*.pdf -c research-papers --watch
-./dewey research research-papers "what are the key findings?" --depth deep
+
+dewey collections create research-papers
+dewey upload ./papers/*.pdf -c research-papers --watch
+dewey research research-papers "what are the key findings?" --depth deep
 ```
+
+## Install
+
+### macOS / Linux
+
+Download the latest release from [GitHub Releases](https://github.com/meetdewey/dewey-cli/releases/latest) and move the binary to your PATH:
+
+```sh
+# macOS arm64 example — adjust OS/arch as needed
+curl -Lo dewey.tar.gz https://github.com/meetdewey/dewey-cli/releases/latest/download/dewey_latest_darwin_arm64.tar.gz
+tar -xzf dewey.tar.gz
+mv dewey /usr/local/bin/
+```
+
+Verify the SHA-256 checksum against `checksums.txt` in the same release.
+
+### Windows
+
+Download `dewey_<version>_windows_amd64.zip` from [Releases](https://github.com/meetdewey/dewey-cli/releases/latest) and extract `dewey.exe` to a directory in your `PATH`.
+
+## Authentication
+
+All commands require a project API key:
+
+```sh
+export DEWEY_API_KEY=dwy_live_…
+```
+
+The `--api-key` flag is also accepted (prefer the env var). Run `dewey doctor` to validate your setup.
+
+## Commands
+
+```
+dewey upload <files...>         Upload files (--watch for live status)
+dewey query  <collection> <q>   Hybrid retrieval
+dewey scan   <collection> <q>   Section-summary scan
+dewey research <col> <question> Streaming cited answer
+dewey watch  [collection]       Tail document-status events
+dewey doctor                    Validate environment
+
+dewey collections list|get|create|update|delete|stats
+dewey docs        list|get|markdown|sections|chunks|images|delete|wait
+dewey duplicates  detect|list|resolve|dismiss
+dewey contradictions detect|list|apply|dismiss
+dewey claims      list|get
+dewey provider-keys list|set|delete
+dewey config      get|set|reset|path
+dewey version
+```
+
+Every command supports `--json` for machine-readable output. See `dewey <command> --help` for full flag details.
+
+## Build from source
+
+```sh
+git clone https://github.com/meetdewey/dewey-cli.git
+cd dewey-cli
+go build -trimpath -o dewey ./cmd/dewey
+```
+
+Requires Go 1.23+.
 
 ## Layout
 
@@ -33,11 +85,22 @@ internal/
   version/                    ldflags-injected build metadata
 ```
 
-## Conventions
+## Output conventions
 
-- Diagnostic noise (status, progress) → stderr
-- Data the user asked for → stdout
-- `--json` is a stable contract; human mode is allowed to be lossy
-- `DEWEY_API_KEY` is the only auth surface in v1; `DEWEY_BASE_URL` overrides
-  the default endpoint
-- Exit codes follow `sysexits.h` (see `internal/cmd/root.go`)
+- Diagnostic noise (status, progress bars) → **stderr**
+- Data (query results, research answers, JSON) → **stdout**
+- `--json` is a stable contract across minor versions; human output is allowed to be lossy
+
+## Configuration
+
+`~/.dewey/config.toml`:
+```toml
+default_collection = "research-papers"
+output = "human"   # "human" | "json"
+color  = "auto"    # "auto" | "always" | "never"
+```
+
+Override the API endpoint (staging, self-hosted, local dev):
+```sh
+export DEWEY_BASE_URL=http://localhost:3000/v1
+```

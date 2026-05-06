@@ -1,0 +1,90 @@
+version: 2
+
+project_name: dewey
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: dewey
+    main: ./cmd/dewey
+    binary: dewey
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      # No arm64 Windows builds — cross-compilation works but there's no demand yet.
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -trimpath
+      - -s -w
+      - -X github.com/lambdabaa/dewey/apps/cli/internal/version.Version={{.Version}}
+      - -X github.com/lambdabaa/dewey/apps/cli/internal/version.Commit={{.Commit}}
+      - -X github.com/lambdabaa/dewey/apps/cli/internal/version.Date={{.Date}}
+
+archives:
+  - id: default
+    name_template: "dewey_{{.Version}}_{{.Os}}_{{.Arch}}"
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    # Include the README so users can read it after extracting.
+    files:
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - '^chore:'
+      - 'Merge pull request'
+      - 'Merge branch'
+
+release:
+  github:
+    owner: meetdewey
+    name: dewey-cli
+  # Mark as pre-release automatically when version contains a pre-release tag
+  # (e.g. v0.1.0-rc.1). Full releases (v1.0.0, v0.2.0) publish as stable.
+  prerelease: auto
+  draft: false
+
+# Homebrew tap — uncomment once meetdewey/homebrew-dewey is ready and
+# HOMEBREW_TAP_TOKEN (a PAT with contents:write on homebrew-dewey) is added
+# as a secret in dewey-cli.
+#
+# brews:
+#   - name: dewey
+#     repository:
+#       owner: meetdewey
+#       name: homebrew-dewey
+#       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+#     commit_author:
+#       name: goreleaser-bot
+#       email: bot@goreleaser.com
+#     homepage: https://meetdewey.com
+#     description: "Terminal-native access to the Dewey document backend API."
+#     license: MIT
+#     install: |
+#       bin.install "dewey"
+#     test: |
+#       system "#{bin}/dewey", "version"
