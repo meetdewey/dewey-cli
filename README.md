@@ -7,6 +7,9 @@ Terminal-native access to the [Dewey](https://meetdewey.com) document backend AP
 ```sh
 export DEWEY_API_KEY=dwy_live_…
 
+# One-time: save your project ID (visible in the dashboard URL)
+dewey config set project_id <your-project-id>
+
 dewey collections create research-papers
 dewey upload ./papers/*.pdf -c research-papers --watch
 dewey research research-papers "what are the key findings?" --depth deep
