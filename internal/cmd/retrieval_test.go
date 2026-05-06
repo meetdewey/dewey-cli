@@ -62,7 +62,7 @@ func TestQuery_UsesLastCollection(t *testing.T) {
 	h.HandleJSON("POST /collections", 200, api.Collection{ID: uuid, Name: "papers"})
 
 	// Populate state via `collections create`.
-	if h.run("collections", "create", "papers") != ExitOK {
+	if h.run("collections", "create", "papers", "--project-id", "proj_test") != ExitOK {
 		t.Fatal(h.stderr.String())
 	}
 	if h.state.LastCollection != uuid {

@@ -34,6 +34,7 @@ type AppContext struct {
 	State      *config.State
 	Renderer   *output.Renderer
 	Collection string // resolved collection (id) when -c is given/cached
+	ProjectID  string // resolved from --project-id flag, config, or env
 }
 
 type rootFlags struct {
@@ -43,6 +44,7 @@ type rootFlags struct {
 	noColor      bool
 	color        string
 	collection   string
+	projectID    string
 	versionShort bool
 }
 
@@ -67,6 +69,7 @@ Authenticate with DEWEY_API_KEY. See ` + "`dewey doctor`" + ` to validate your s
 	root.PersistentFlags().BoolVar(&flags.noColor, "no-color", false, "Disable ANSI color")
 	root.PersistentFlags().StringVar(&flags.color, "color", "", "Color mode: auto|always|never")
 	root.PersistentFlags().StringVarP(&flags.collection, "collection", "c", "", "Collection ID or name (defaults to last-used)")
+	root.PersistentFlags().StringVarP(&flags.projectID, "project-id", "p", "", "Project ID (saved to config after first use)")
 
 	// Build a function that lazily constructs the AppContext for each subcommand.
 	makeAppCtx := func(requireAuth bool) (*AppContext, error) {
@@ -111,6 +114,13 @@ Authenticate with DEWEY_API_KEY. See ` + "`dewey doctor`" + ` to validate your s
 			Config:   cfg,
 			State:    state,
 			Renderer: r,
+		}
+
+		// Resolve --project-id: flag > config.
+		if flags.projectID != "" {
+			ctx.ProjectID = flags.projectID
+		} else if cfg.ProjectID != "" {
+			ctx.ProjectID = cfg.ProjectID
 		}
 
 		// Resolve --collection: either explicit, last-used, or empty.

@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/lambdabaa/dewey/apps/cli/internal/api"
 	"github.com/spf13/cobra"
 )
@@ -85,12 +87,24 @@ func newCollectionsCmd(makeAppCtx func(bool) (*AppContext, error)) *cobra.Comman
 			if err != nil {
 				return err
 			}
+			// Resolve project ID: --project-id flag > config > --project-id inline flag.
+			projectID := app.ProjectID
+			if inlineID, _ := cmd.Flags().GetString("project-id"); inlineID != "" {
+				projectID = inlineID
+			}
+			if projectID == "" {
+				return fmt.Errorf(
+					"project ID required — pass --project-id <id> or run:\n" +
+						"  dewey config set project_id <id>\n" +
+						"Your project ID is visible in the dashboard URL.")
+			}
 			visibility, _ := cmd.Flags().GetString("visibility")
 			embedModel, _ := cmd.Flags().GetString("embedding-model")
 			chunkSize, _ := cmd.Flags().GetInt("chunk-size")
 			chunkOverlap, _ := cmd.Flags().GetInt("chunk-overlap")
 			in := api.CreateCollectionInput{
 				Name:           args[0],
+				ProjectID:      projectID,
 				Visibility:     visibility,
 				EmbeddingModel: embedModel,
 				ChunkSize:      chunkSize,
@@ -99,6 +113,11 @@ func newCollectionsCmd(makeAppCtx func(bool) (*AppContext, error)) *cobra.Comman
 			col, err := app.Client.CreateCollection(cmd.Context(), in)
 			if err != nil {
 				return err
+			}
+			// Persist the project ID so future commands don't need it.
+			if app.Config.ProjectID == "" {
+				app.Config.ProjectID = projectID
+				_ = app.Config.Save()
 			}
 			app.rememberCollection(col.ID)
 			r := app.Renderer
@@ -109,6 +128,7 @@ func newCollectionsCmd(makeAppCtx func(bool) (*AppContext, error)) *cobra.Comman
 			return nil
 		},
 	}
+	createCmd.Flags().String("project-id", "", "Project ID (saved to config after first use)")
 	createCmd.Flags().String("visibility", "", "private | public")
 	createCmd.Flags().String("embedding-model", "", "Embedding model override")
 	createCmd.Flags().Int("chunk-size", 0, "Chunk size in tokens")

@@ -40,6 +40,7 @@ type CollectionStats struct {
 
 type CreateCollectionInput struct {
 	Name           string `json:"name"`
+	ProjectID      string `json:"projectId"`
 	Visibility     string `json:"visibility,omitempty"`
 	ChunkSize      int    `json:"chunkSize,omitempty"`
 	ChunkOverlap   int    `json:"chunkOverlap,omitempty"`

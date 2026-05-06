@@ -100,10 +100,12 @@ func newConfigCmd(makeAppCtx func(bool) (*AppContext, error)) *cobra.Command {
 	return c
 }
 
-var configKeys = []string{"default_collection", "output", "color", "base_url"}
+var configKeys = []string{"project_id", "default_collection", "output", "color", "base_url"}
 
 func configValueByKey(cfg *config.Config, key string) *string {
 	switch strings.ToLower(key) {
+	case "project_id":
+		return &cfg.ProjectID
 	case "default_collection":
 		return &cfg.DefaultCollection
 	case "output":
@@ -119,6 +121,8 @@ func configValueByKey(cfg *config.Config, key string) *string {
 func setConfigValue(cfg *config.Config, key, value string) error {
 	v := reflect.ValueOf(cfg).Elem()
 	switch strings.ToLower(key) {
+	case "project_id":
+		v.FieldByName("ProjectID").SetString(value)
 	case "default_collection":
 		v.FieldByName("DefaultCollection").SetString(value)
 	case "output":

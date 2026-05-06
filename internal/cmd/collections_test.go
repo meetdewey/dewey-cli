@@ -81,7 +81,7 @@ func TestCollections_Create_PersistsLastCollection(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(api.Collection{ID: "col_new", Name: "papers"})
 	})
 
-	if h.run("collections", "create", "papers") != ExitOK {
+	if h.run("collections", "create", "papers", "--project-id", "proj_test") != ExitOK {
 		t.Fatalf("stderr=%s", h.stderr.String())
 	}
 	if h.state.LastCollection != "col_new" {

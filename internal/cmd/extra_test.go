@@ -107,7 +107,7 @@ func TestContradictions_Apply(t *testing.T) {
 	})
 	// Populate last_collection so apply can use resolveCollection("").
 	h.HandleJSON("POST /collections", 200, api.Collection{ID: uuid, Name: "papers"})
-	if h.run("collections", "create", "papers") != ExitOK {
+	if h.run("collections", "create", "papers", "--project-id", "proj_test") != ExitOK {
 		t.Fatal("setup")
 	}
 	h.stdout.Reset()
@@ -169,7 +169,7 @@ func TestConfig_Reset_ClearsState(t *testing.T) {
 	const uuid = "33333333-3333-3333-3333-333333333333"
 	h := newHarness(t)
 	h.HandleJSON("POST /collections", 200, api.Collection{ID: uuid, Name: "papers"})
-	if h.run("collections", "create", "papers") != ExitOK {
+	if h.run("collections", "create", "papers", "--project-id", "proj_test") != ExitOK {
 		t.Fatal(h.stderr.String())
 	}
 	if h.state.LastCollection != uuid {
