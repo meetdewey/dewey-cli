@@ -20,7 +20,7 @@ dewey research research-papers "what are the key findings?" --depth deep
 curl -fsSL https://raw.githubusercontent.com/meetdewey/dewey-cli/main/install.sh | sh
 ```
 
-The script detects your OS and arch, downloads the correct binary, verifies the SHA-256 checksum, and installs to `/usr/local/bin`. Override with `INSTALL_DIR=/usr/bin sh install.sh`.
+The script detects your OS and arch, downloads the correct binary, verifies the SHA-256 checksum, and installs to `~/.local/bin` (no sudo required). Override with `INSTALL_DIR=/usr/local/bin sh install.sh`.
 
 Or download a specific release directly — archives are named `dewey_<version>_<os>_<arch>.tar.gz`:
 

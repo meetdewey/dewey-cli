@@ -10,7 +10,7 @@
 set -e
 
 REPO="meetdewey/dewey-cli"
-INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
+INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
 
 # ── Detect OS and arch ────────────────────────────────────────────────────────
 
@@ -76,11 +76,23 @@ tar -xzf "$TMP/$ARCHIVE" -C "$TMP"
 
 # ── Install ───────────────────────────────────────────────────────────────────
 
-if [ -w "$INSTALL_DIR" ]; then
-  mv "$TMP/dewey" "$INSTALL_DIR/dewey"
-else
-  sudo mv "$TMP/dewey" "$INSTALL_DIR/dewey"
-fi
+mkdir -p "$INSTALL_DIR"
+mv "$TMP/dewey" "$INSTALL_DIR/dewey"
+chmod +x "$INSTALL_DIR/dewey"
 
-echo "dewey installed successfully."
+echo "dewey installed successfully to $INSTALL_DIR/dewey"
+
+# Warn if the directory isn't on PATH.
+case ":$PATH:" in
+  *":$INSTALL_DIR:"*) ;;
+  *)
+    echo ""
+    echo "  Note: $INSTALL_DIR is not in your PATH."
+    echo "  Add this to your shell profile (~/.zshrc or ~/.bashrc):"
+    echo ""
+    echo "    export PATH=\"\$HOME/.local/bin:\$PATH\""
+    echo ""
+    ;;
+esac
+
 "$INSTALL_DIR/dewey" version
