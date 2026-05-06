@@ -62,15 +62,14 @@ trap 'rm -rf "$TMP"' EXIT
 
 curl -fsSL "$URL" -o "$TMP/$ARCHIVE"
 
-# Verify checksum when sha256sum or shasum is available.
-if command -v sha256sum >/dev/null 2>&1; then
-  curl -fsSL "$CHECKSUM_URL" -o "$TMP/checksums.txt"
-  (cd "$TMP" && grep "$ARCHIVE" checksums.txt | sha256sum --check --status)
-  echo "Checksum verified."
-elif command -v shasum >/dev/null 2>&1; then
-  curl -fsSL "$CHECKSUM_URL" -o "$TMP/checksums.txt"
-  (cd "$TMP" && grep "$ARCHIVE" checksums.txt | shasum -a 256 --check --status)
-  echo "Checksum verified."
+# Verify checksum. macOS ships shasum (perl); Linux ships sha256sum (coreutils).
+curl -fsSL "$CHECKSUM_URL" -o "$TMP/checksums.txt"
+if [ "$OS" = "darwin" ] && command -v shasum >/dev/null 2>&1; then
+  (cd "$TMP" && grep "$ARCHIVE" checksums.txt | shasum -a 256 -c)
+elif command -v sha256sum >/dev/null 2>&1; then
+  (cd "$TMP" && grep "$ARCHIVE" checksums.txt | sha256sum -c)
+else
+  echo "Warning: no checksum tool found, skipping verification." >&2
 fi
 
 tar -xzf "$TMP/$ARCHIVE" -C "$TMP"
