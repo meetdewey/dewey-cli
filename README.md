@@ -16,16 +16,20 @@ dewey research research-papers "what are the key findings?" --depth deep
 
 ### macOS / Linux
 
-Download the latest release from [GitHub Releases](https://github.com/meetdewey/dewey-cli/releases/latest) and move the binary to your PATH:
-
 ```sh
-# macOS arm64 example — adjust OS/arch as needed
-curl -Lo dewey.tar.gz https://github.com/meetdewey/dewey-cli/releases/latest/download/dewey_latest_darwin_arm64.tar.gz
-tar -xzf dewey.tar.gz
-mv dewey /usr/local/bin/
+curl -fsSL https://raw.githubusercontent.com/meetdewey/dewey-cli/main/install.sh | sh
 ```
 
-Verify the SHA-256 checksum against `checksums.txt` in the same release.
+The script detects your OS and arch, downloads the correct binary, verifies the SHA-256 checksum, and installs to `/usr/local/bin`. Override with `INSTALL_DIR=/usr/bin sh install.sh`.
+
+Or download a specific release directly — archives are named `dewey_<version>_<os>_<arch>.tar.gz`:
+
+```sh
+# Example: v0.1.0 on macOS arm64
+curl -Lo dewey.tar.gz \
+  https://github.com/meetdewey/dewey-cli/releases/download/v0.1.0/dewey_0.1.0_darwin_arm64.tar.gz
+tar -xzf dewey.tar.gz && mv dewey /usr/local/bin/
+```
 
 ### Windows
 
