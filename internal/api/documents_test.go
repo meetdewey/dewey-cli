@@ -188,6 +188,8 @@ func TestUploadFile_Presigned_LargeFile(t *testing.T) {
 		if r.Method != http.MethodPut {
 			t.Errorf("expected PUT, got %s", r.Method)
 		}
+		// Drain body so the client finishes writing and progressReader.Read is called.
+		_, _ = io.Copy(io.Discard, r.Body)
 		atomic.AddInt32(&s3Hits, 1)
 		w.WriteHeader(200)
 	}))

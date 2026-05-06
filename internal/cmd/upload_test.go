@@ -104,6 +104,7 @@ func TestUpload_PresignThenConfirm(t *testing.T) {
 		if r.Method != http.MethodPut {
 			t.Errorf("S3 expected PUT got %s", r.Method)
 		}
+		_, _ = io.Copy(io.Discard, r.Body)
 		atomic.AddInt32(&s3Hits, 1)
 		w.WriteHeader(200)
 	}))
