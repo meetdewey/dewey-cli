@@ -148,6 +148,7 @@ Authenticate with DEWEY_API_KEY. See ` + "`dewey doctor`" + ` to validate your s
 	root.AddCommand(newDuplicatesCmd(makeAppCtx))
 	root.AddCommand(newContradictionsCmd(makeAppCtx))
 	root.AddCommand(newClaimsCmd(makeAppCtx))
+	root.AddCommand(newAgentsCmd(makeAppCtx))
 
 	// Cancel context on Ctrl-C.
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

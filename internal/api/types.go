@@ -297,3 +297,44 @@ type DocumentEvent struct {
 	Filename   string `json:"filename,omitempty"`
 	Error      string `json:"error,omitempty"`
 }
+
+// AgentSource is one section-level citation from an agent run.
+type AgentSource struct {
+	ChunkID        string  `json:"chunkId"`
+	SectionID      string  `json:"sectionId"`
+	SectionTitle   string  `json:"sectionTitle"`
+	SectionLevel   int     `json:"sectionLevel"`
+	DocumentID     string  `json:"documentId"`
+	Filename       string  `json:"filename"`
+	Score          float64 `json:"score"`
+	CollectionID   string  `json:"collectionId"`
+	CollectionName string  `json:"collectionName"`
+}
+
+// AgentInvokeResult mirrors POST /invoke/sync.
+type AgentInvokeResult struct {
+	RunID    string        `json:"runId"`
+	Response string        `json:"response"`
+	Sources  []AgentSource `json:"sources"`
+	Status   string        `json:"status"`
+	Warnings []string      `json:"warnings,omitempty"`
+}
+
+// AgentRunEvent is one frame on the SSE stream from POST /invoke. Fields are
+// flattened across event types — only the ones relevant to `Type` are set.
+type AgentRunEvent struct {
+	Type           string                 `json:"type"`
+	RunID          string                 `json:"runId,omitempty"`
+	Tool           string                 `json:"tool,omitempty"`
+	CollectionID   string                 `json:"collectionId,omitempty"`
+	Args           map[string]interface{} `json:"args,omitempty"`
+	StepIndex      int                    `json:"stepIndex,omitempty"`
+	Summary        string                 `json:"summary,omitempty"`
+	Content        string                 `json:"content,omitempty"`
+	Status         string                 `json:"status,omitempty"`
+	Response       string                 `json:"response,omitempty"`
+	IterationsUsed int                    `json:"iterationsUsed,omitempty"`
+	Sources        []AgentSource          `json:"sources,omitempty"`
+	Message        string                 `json:"message,omitempty"`
+	Code           string                 `json:"code,omitempty"`
+}

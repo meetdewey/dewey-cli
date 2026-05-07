@@ -63,6 +63,7 @@ dewey docs        list|get|markdown|sections|chunks|images|delete|wait
 dewey duplicates  detect|list|resolve|dismiss
 dewey contradictions detect|list|apply|dismiss
 dewey claims      list|get
+dewey agents      invoke
 dewey provider-keys list|set|delete
 dewey config      get|set|reset|path
 dewey version
@@ -103,6 +104,8 @@ internal/
 `~/.dewey/config.toml`:
 ```toml
 default_collection = "research-papers"
+project_id = "…"   # used by `dewey collections create`, `dewey agents invoke`
+org_id     = "…"   # used by `dewey agents invoke`
 output = "human"   # "human" | "json"
 color  = "auto"    # "auto" | "always" | "never"
 ```

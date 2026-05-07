@@ -43,6 +43,8 @@ func newConfigCmd(makeAppCtx func(bool) (*AppContext, error)) *cobra.Command {
 				if r.IsJSON() {
 					return r.JSON(cfg)
 				}
+				r.KeyValue("project_id", cfg.ProjectID)
+				r.KeyValue("org_id", cfg.OrgID)
 				r.KeyValue("default_collection", cfg.DefaultCollection)
 				r.KeyValue("output", cfg.Output)
 				r.KeyValue("color", cfg.Color)
@@ -100,12 +102,14 @@ func newConfigCmd(makeAppCtx func(bool) (*AppContext, error)) *cobra.Command {
 	return c
 }
 
-var configKeys = []string{"project_id", "default_collection", "output", "color", "base_url"}
+var configKeys = []string{"project_id", "org_id", "default_collection", "output", "color", "base_url"}
 
 func configValueByKey(cfg *config.Config, key string) *string {
 	switch strings.ToLower(key) {
 	case "project_id":
 		return &cfg.ProjectID
+	case "org_id":
+		return &cfg.OrgID
 	case "default_collection":
 		return &cfg.DefaultCollection
 	case "output":
@@ -123,6 +127,8 @@ func setConfigValue(cfg *config.Config, key, value string) error {
 	switch strings.ToLower(key) {
 	case "project_id":
 		v.FieldByName("ProjectID").SetString(value)
+	case "org_id":
+		v.FieldByName("OrgID").SetString(value)
 	case "default_collection":
 		v.FieldByName("DefaultCollection").SetString(value)
 	case "output":

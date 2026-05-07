@@ -20,6 +20,7 @@ const (
 type Config struct {
 	DefaultCollection string `toml:"default_collection,omitempty"`
 	ProjectID         string `toml:"project_id,omitempty"`
+	OrgID             string `toml:"org_id,omitempty"`
 	Output            string `toml:"output,omitempty"` // "human" | "json"
 	Color             string `toml:"color,omitempty"`  // "auto" | "always" | "never"
 	BaseURL           string `toml:"base_url,omitempty"`

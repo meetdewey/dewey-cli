@@ -126,6 +126,7 @@ func (h *harness) run(args ...string) int {
 	root.PersistentFlags().BoolVar(&rf.noColor, "no-color", false, "")
 	root.PersistentFlags().StringVar(&rf.color, "color", "", "")
 	root.PersistentFlags().StringVarP(&rf.collection, "collection", "c", "", "")
+	root.PersistentFlags().StringVarP(&rf.projectID, "project-id", "p", "", "")
 
 	makeAppCtx := func(requireAuth bool) (*AppContext, error) {
 		cfg, err := config.Load()
@@ -173,6 +174,11 @@ func (h *harness) run(args ...string) int {
 		} else if state.LastCollection != "" {
 			ctx.Collection = state.LastCollection
 		}
+		if rf.projectID != "" {
+			ctx.ProjectID = rf.projectID
+		} else if cfg.ProjectID != "" {
+			ctx.ProjectID = cfg.ProjectID
+		}
 		return ctx, nil
 	}
 
@@ -190,6 +196,7 @@ func (h *harness) run(args ...string) int {
 	root.AddCommand(newDuplicatesCmd(makeAppCtx))
 	root.AddCommand(newContradictionsCmd(makeAppCtx))
 	root.AddCommand(newClaimsCmd(makeAppCtx))
+	root.AddCommand(newAgentsCmd(makeAppCtx))
 
 	root.SetArgs(args)
 	root.SetOut(h.stdout)
